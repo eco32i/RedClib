@@ -5,22 +5,40 @@ input:
                 #   - forward.library.fastq or .gz
                 #   - reverse.library.fastq or .gz
 
-                test:
-                    - /home/agalicina/soft/RedClib/data/fastq/sample_R1_001.fastq.gz
-                    - /home/agalicina/soft/RedClib/data/fastq/sample_R2_001.fastq.gz
-                redc-fibr:
-                    - sra:SRR10010324
+                ag01:
+                    - ../data/IS-477_ag01_S1_R1_001.fastq.gz
+                    - ../data/IS-477_ag01_S1_R2_001.fastq.gz
+                      
+                ag02:
+                    - ../data/IS-477_ag02_S2_R1_001.fastq.gz
+                    - ../data/IS-477_ag02_S2_R2_001.fastq.gz
+                    
+                ag03:
+                    - ../data/IS-477_ag03_S3_R1_001.fastq.gz
+                    - ../data/IS-477_ag03_S3_R2_001.fastq.gz
+
+                ag04:
+                    - ../data/IS-477_ag04_S4_R1_001.fastq.gz
+                    - ../data/IS-477_ag04_S4_R2_001.fastq.gz
+
+                ag09:
+                    - ../data/IS-477_ag09_S9_R1_001.fastq.gz
+                    - ../data/IS-477_ag09_S9_R2_001.fastq.gz
+                      
+                ag12:
+                    - ../data/IS-477_ag12_S10_R1_001.fastq.gz
+                    - ../data/IS-477_ag12_S10_R2_001.fastq.gz
 
         oligos: # Paths to files with oligos
                 # Bridge fasta has 1 record:
-                bridge_forward: /home/agalicina/soft/RedClib/data/oligos/br_37_for.fasta
-                bridge_reverse: /home/agalicina/soft/RedClib/data/oligos/br_37_rev.fasta
+                bridge_forward: data/oligos/br_37_for.fasta
+                bridge_reverse: data/oligos/br_37_rev.fasta
                 # GGG fasta has 1 record:
-                ggg: /home/agalicina/soft/RedClib/data/oligos/ggg.fasta
+                ggg: data/oligos/ggg.fasta
                 # Adaptors files have 2 records for two variants of adaptors:
-                adaptor_forward: /home/agalicina/soft/RedClib/data/oligos/for_20.fasta
-                adaptor_reverse: /home/agalicina/soft/RedClib/data/oligos/rev_20.fasta
-                adaptor_reverse_short: /home/agalicina/soft/RedClib/data/oligos/rev_16.fasta
+                adaptor_forward: data/oligos/for_20.fasta
+                adaptor_reverse: data/oligos/rev_20.fasta
+                adaptor_reverse_short: data/oligos/rev_16.fasta
 
         oligos_variants: # Numbers of records (variants) in the files with oligos
                 bridge_forward: 1 #3 # Modify this for multiple variants, e.g. br_37_for_variants.fasta
@@ -30,36 +48,41 @@ input:
                 adaptor_reverse: 2
                 adaptor_reverse_short: 1
 genome:
-        assembly_name: hg19
+        assembly_name: MG1655
 
         # If auto_download_genome in on, download the genome with assembly_name from UCSC,
         # build the index and calculate the chromosome sizes.
-        auto_download_genome: true
+        auto_download_genome: false
 
         # If auto_download is off, the local files will be used instead.
         # "fasta" and "chromsizes" can be URLs instead.
         # Note that if "fasta" is URL then index_prefix is ignored and index will be build de novo.
-        #fasta:        /home/user/GENOMES/hg19/hg19.fa
-        #chromsizes:   /home/user/GENOMES/hg19/hg19.chromsizes.txt
-        #index_prefix: /home/user/GENOMES/hg19/hisat2/genome
+        fasta:        /mnt/ssd/ref/ecoli/MG1655/MG1655.fa
+        chromsizes:   /mnt/ssd/ref/ecoli/MG1655/MG1655.chromsizes.txt
+        index_prefix: /mnt/ssd/ref/ecoli/MG1655/hisat2/genome
 
 rna_annotation:
         # We use RNA annotation from Gencode, it's custom name:
-        rna_annotation_name: gencode19
+        #rna_annotation_name: gencode19
 
         # Can be local file or URL:
-        genes_gtf: ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/gencode.v19.chr_patch_hapl_scaff.annotation.gtf.gz
+        genes_gtf: /mnt/ssd/ref/ecoli/MG1655/MG1655.gff
 
 protocol:
         read_length: 
-                test:      151
-                redc-fibr: 125
+                ag01:      101
+                ag02:      101
+                ag03:      101
+                ag04:      101
+                ag09:      101
+                ag12:      101
 
         # Keys for loading restriction enzymes data:
         renz:
                 # Syntax, see filters.restriction for example usage of keys:
                 # key: actual_restr_enz_name
-                nla: NlaIII
+                #nla: NlaIII
+                hpa: HpaII
                 mme: MmeI
                 dpn: DpnII
                 mse: MseI
@@ -87,7 +110,8 @@ run:
         check_GA: true
 
         # DNA extension (e.g. restriction site). Set to "" or remove if no restirction site extension is needed.
-        dna_extension: "CATG"
+        #dna_extension: "CATG"
+        dna_extension: "G"
 
         # Min size for DNA/RNA1/RNA2 part so that it's subjected to mapping:
         min_substring_size: 14
@@ -96,15 +120,15 @@ run:
         check_restriction: true
         restriction_check:
                 dna:
-                        - nla
+                        - hpa
                 dna_nonextended:
-                        - nla
+                        - hpa
                 rna1:
-                        - nla
+                        - hpa
                         - mmep # Mme recognised on plus chain
                         - mmen # Mme recognised on minus chain
                 rna2:
-                        - nla
+                        - hpa
                         - mmep
                         - mmen
 
@@ -138,16 +162,16 @@ filters:
                         - '(rna2_strand=="+") & (rna2_start_mmen_right<=19) & (rna2_start_mmen_right>=-18)'
                         - '(rna2_strand=="-") & (rna2_end_mmep_left<=-25) & (rna2_end_mmep_left>=-26)'
                         - '(rna2_strand=="-") & (rna2_end_mmen_right<=21) & (rna2_end_mmen_right>=20)'
-                rna2_nla_failed:
-                        - '(rna2_strand=="+") & (rna2_start_nla_left>=-5) & (rna2_start_nla_left<=0)'
-                        - '(rna2_strand=="+") & (rna2_start_nla_right>=0) & (rna2_start_nla_right<=1)'
-                        - '(rna2_strand=="-") & (rna2_end_nla_left>=-5) & (rna2_end_nla_left<=0)'
-                        - '(rna2_strand=="-") & (rna2_end_nla_right>=0) & (rna2_end_nla_right<=1)'
-                rna1_nla_failed:
-                        - '(rna1_strand=="+") & (rna1_start_nla_left>=-5) & (rna1_start_nla_left<=0)'
-                        - '(rna1_strand=="+") & (rna1_start_nla_right>=0) & (rna1_start_nla_right<=1)'
-                        - '(rna1_strand=="-") & (rna1_end_nla_left>=-5) & (rna1_end_nla_left<=0)'
-                        - '(rna1_strand=="-") & (rna1_end_nla_right>=0) & (rna1_end_nla_right<=1)'
+                rna2_hpa_failed:
+                        - '(rna2_strand=="+") & (rna2_start_hpa_left>=-5) & (rna2_start_hpa_left<=0)'
+                        - '(rna2_strand=="+") & (rna2_start_hpa_right>=0) & (rna2_start_hpa_right<=1)'
+                        - '(rna2_strand=="-") & (rna2_end_hpa_left>=-5) & (rna2_end_hpa_left<=0)'
+                        - '(rna2_strand=="-") & (rna2_end_hpa_right>=0) & (rna2_end_hpa_right<=1)'
+                rna1_hpa_failed:
+                        - '(rna1_strand=="+") & (rna1_start_hpa_left>=-5) & (rna1_start_hpa_left<=0)'
+                        - '(rna1_strand=="+") & (rna1_start_hpa_right>=0) & (rna1_start_hpa_right<=1)'
+                        - '(rna1_strand=="-") & (rna1_end_hpa_left>=-5) & (rna1_end_hpa_left<=0)'
+                        - '(rna1_strand=="-") & (rna1_end_hpa_right>=0) & (rna1_end_hpa_right<=1)'
 
 # Understanding the distance filtration for NlaIII example:
 # # For mappings on positive RNA strand (+):
@@ -168,7 +192,7 @@ filters:
 #  1  CATGN|->N
 
         # Pattern for filtering the relevant chromosomes:
-        canonical_chromosomes: "chr[0-9,X,Y]|chr[0-9][0-9]"
+        canonical_chromosomes: "MG1655"
 
         additional_filters:
                 RNAsDirectionPassed: "(rna2_chr==rna1_chr) & (rna2_strand!=rna1_strand)"
@@ -188,13 +212,14 @@ filters:
                 # Filter 6a: Trimmed segments are > 14 bp
                 F6a_passedTrimming_strict: "(dna_R1_len_trim_adjusted>=18)&(dna_R1_len_trim_adjusted<=20)&(rna1_R1_len_trim_adjusted>=14)&(rna2_R2_len_trim_adjusted>=14)"
                 # Filter 7: All three segments are uniquely mapped to chromosomes
-                F7_uniqueCanonical: "dna_is_not_multi & rna1_is_not_multi & rna2_is_not_multi & dna_is_mapped & rna1_is_mapped & rna2_is_mapped & dna_chr_canonical & rna1_chr_canonical & rna2_chr_canonical"
+                #F7_uniqueCanonical: "dna_is_not_multi & rna1_is_not_multi & rna2_is_not_multi & dna_is_mapped & rna1_is_mapped & rna2_is_mapped & dna_chr_canonical & rna1_chr_canonical & rna2_chr_canonical"
+                F7_uniqueCanonical: "dna_is_not_multi & rna1_is_not_multi & rna2_is_not_multi & dna_is_mapped & rna1_is_mapped & rna2_is_mapped"
                 F7a_RNAsameChr: "rna1_chr==rna2_chr"
                 F7b_RNAoppositeStrands: "rna1_strand!=rna2_strand"
                 # Filter 8a: Same pos of DNA and RNA
                 F8a_notRNADNASamePos: "~RNADNASamePos"
                 # Filter 8b: Confirm absence of NlaIII and MmeI influence on RNA
-                F8b_RNAnotDigested: "~rna1_nla_failed & ~rna2_nla_failed & ~rna2_mme_failed"
+                F8b_RNAnotDigested: "~rna1_hpa_failed & ~rna2_hpa_failed & ~rna2_mme_failed"
                 # Filter 9: RNA1 and RNA distance is small enough
                 F9_closeRNA: "np.abs(rna2_start-rna1_start)<1e4"
 

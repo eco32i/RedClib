@@ -394,7 +394,7 @@ process DEDUP{
     script:
     """
     # Trim N basepairs
-    trimmomatic PE -threads ${task.cpus} ${input_fq1} ${input_fq2} \
+    TrimmomaticPE -threads ${task.cpus} ${input_fq1} ${input_fq2} \
                                          ${library}_1P ${library}_1U \
                                          ${library}_2P ${library}_2U CROP:${cropped_length}
 
@@ -437,7 +437,7 @@ process TRIM_CHUNKS{
     script:
     """
     # Trim with specified parameters
-    trimmomatic PE -phred33 -threads ${task.cpus} ${input_fq1} ${input_fq2} \
+    TrimmomaticPE -phred33 -threads ${task.cpus} ${input_fq1} ${input_fq2} \
                             ${library}.${chunk}.1.trimmed.fq ${library}_1U \
                             ${library}.${chunk}.2.trimmed.fq ${library}_2U ${params_trimmomatic}
     """
